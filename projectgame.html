@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkers Game</title>
+    <style>
+        /* --- General Styling --- */
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0e0; /* Off-white/Cream background */
+        }
+
+        /* --- Game Board Styling --- */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(8, 60px);
+            border: 8px solid #8b4513; /* Saddle Brown Border */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            margin: 20px;
+        }
+
+        .square {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Natural Colors for the Board */
+        .square.dark {
+            background-color: #a0522d; /* Sienna (Dark Wood) */
+        }
+
+        .square.light {
+            background-color: #d2b48c; /* Tan (Light Wood) */
+        }
+
+        .square.highlight {
+            /* Highlight for potential move destinations */
+            box-shadow: inset 0 0 0 4px #00ff00; 
+            cursor: pointer;
+        }
+        
+        .square.selected {
+            /* Highlight for the currently selected piece */
+            box-shadow: inset 0 0 0 4px #4169e1; /* Royal Blue */
+        }
+
+        /* --- Piece Styling --- */
+        .piece {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            z-index: 10; 
+        }
+        
+        /* Natural Colors for the Pieces */
+        .piece.player1 {
+            background-color: #8b0000; /* Dark Red/Maroon */
+            color: white;
+        }
+
+        .piece.player2 {
+            background-color: #000000; /* Black */
+            color: white;
+        }
+
+        .king::after {
+            content: '★'; /* Star for King piece */
+            position: absolute;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        /* --- Info and Controls --- */
+        .game-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls button {
+            padding: 10px 15px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .controls #new-game {
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+        
+        .controls #undo, .controls #redo {
+            background-color: #f4a460; /* Sandy Brown */
+            color: #333;
+        }
+        
+        .controls button:hover:not(:disabled) {
+            opacity: 0.8;
+        }
+        
+        .controls button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .nav-bar {
+            background-color: #ff6347; /* Tomato Red accent for visibility */
+            padding: 10px 0;
+            text-align: center;
+            /* Sticky position makes it stay at the top when scrolling (optional) */
+            /* position: sticky;
+            top: 0;
+            z-index: 1000; */
+        }
+
+        .nav-bar a {
+            color: #001f3f; /* Deep Navy Blue text */
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin: 0 20px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-bar a:hover {
+            background-color: #001f3f; /* Deep Navy Blue background on hover */
+            color: #ffffff; /* White text on hover */
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+            <a href="Scrapsheet.html">All About Monkeys</a>
+            <a href="index.html">Resume</a>
+    </div>
+    <div class="game-info">
+        <h2 id="turn-display">Player 1's Turn (Red)</h2>
+        <div class="controls">
+            <button id="new-game">Start New Game</button>
+            <button id="undo" disabled>Undo Move</button>
+            <button id="redo" disabled>Redo Move</button>
+        </div>
+    </div>
+
+    <div class="board" id="checkers-board">
+        </div>
+
+    <script>
+        // --- GAME CONSTANTS AND STATE ---
+        const BOARD_SIZE = 8;
+        const boardElement = document.getElementById('checkers-board');
+        const turnDisplay = document.getElementById('turn-display');
+        const undoButton = document.getElementById('undo');
+        const redoButton = document.getElementById('redo');
+
+        let boardState = []; 
+        let currentPlayer = 1; 
+        let selectedPiece = null; 
+        let mandatoryJumpPiece = null; 
+
+        // State history for Undo/Redo
+        let history = [];
+        let historyIndex = -1;
+
+        // --- CORE GAME SETUP ---
+
+        /** Initializes the board state for a new game. */
+        function initializeBoardState() {
+            const state = [];
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                state[r] = [];
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    // Only place pieces on dark squares (r + c is odd)
+                    if ((r + c) % 2 !== 0) {
+                        if (r < 3) {
+                            state[r][c] = { player: 1, isKing: false }; 
+                        } else if (r > 4) {
+                            state[r][c] = { player: 2, isKing: false }; 
+                        } else {
+                            state[r][c] = null; // Empty
+                        }
+                    } else {
+                        state[r][c] = null; // Empty on light squares
+                    }
+                }
+            }
+            return state;
+        }
+
+        /** Saves the current board state to the history stack. */
+        function saveHistory() {
+            // Remove future states if a new move is made after an undo
+            history.splice(historyIndex + 1);
+
+            // Deep clone the current state to save
+            const stateClone = boardState.map(row => row.map(cell => cell ? { ...cell } : null));
+            history.push({
+                board: stateClone,
+                player: currentPlayer,
+                mandatory: mandatoryJumpPiece ? { ...mandatoryJumpPiece } : null
+            });
+            historyIndex = history.length - 1;
+
+            updateUndoRedoButtons();
+        }
+
+        /** Loads a state from the history stack. */
+        function loadHistoryState(index) {
+            if (index < 0 || index >= history.length) return;
+
+            const state = history[index];
+            // Load the deep cloned state
+            boardState = state.board.map(row => row.map(cell => cell ? { ...cell } : null));
+            currentPlayer = state.player;
+            mandatoryJumpPiece = state.mandatory;
+            historyIndex = index;
+            selectedPiece = null; 
+
+            redrawBoard();
+            updateGameInfo();
+            updateUndoRedoButtons();
+            clearHighlights();
+        }
+
+        /** Starts or resets the game. */
+        function startGame() {
+            boardState = initializeBoardState();
+            currentPlayer = 1;
+            selectedPiece = null;
+            mandatoryJumpPiece = null;
+            history = [];
+            historyIndex = -1;
+            
+            saveHistory(); 
+            redrawBoard();
+            updateGameInfo();
+        }
+
+
+        // --- UI RENDERING ---
+
+        /** Redraws the entire board based on the boardState array. */
+        function redrawBoard() {
+            boardElement.innerHTML = ''; 
+
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    const square = document.createElement('div');
+                    square.classList.add('square');
+                    
+                    square.classList.add((r + c) % 2 === 0 ? 'light' : 'dark');
+                    
+                    square.dataset.row = r;
+                    square.dataset.col = c;
+                    
+                    square.onclick = () => handleSquareClick(r, c);
+
+                    const pieceData = boardState[r][c];
+                    if (pieceData) {
+                        const piece = document.createElement('div');
+                        piece.classList.add('piece');
+                        piece.classList.add('player' + pieceData.player);
+                        if (pieceData.isKing) {
+                            piece.classList.add('king');
+                        }
+                        
+                        square.appendChild(piece);
+                    }
+                    
+                    // Re-apply the 'selected' highlight if a piece is mandatory for multi-jump
+                    if (mandatoryJumpPiece && mandatoryJumpPiece.row === r && mandatoryJumpPiece.col === c) {
+                        square.classList.add('selected');
+                    }
+
+                    boardElement.appendChild(square);
+                }
+            }
+            // If there is a selected piece, re-highlight its valid moves after redrawing
+            if (selectedPiece) {
+                const pieceData = boardState[selectedPiece.row][selectedPiece.col];
+                if (pieceData) {
+                    highlightValidMoves(selectedPiece.row, selectedPiece.col, pieceData.isKing);
+                }
+            }
+        }
+
+        /** Clears all highlight classes from the board squares. */
+        function clearHighlights() {
+            document.querySelectorAll('.square').forEach(sq => {
+                sq.classList.remove('selected', 'highlight');
+            });
+        }
+
+        /** Updates the turn display and checks for end-game conditions. */
+        function updateGameInfo() {
+            const p1Pieces = boardState.flat().filter(p => p && p.player === 1).length;
+            const p2Pieces = boardState.flat().filter(p => p && p.player === 2).length;
+
+            if (p1Pieces === 0) {
+                turnDisplay.textContent = 'Game Over! Player 2 (Black) Wins!';
+                return;
+            }
+            if (p2Pieces === 0) {
+                turnDisplay.textContent = 'Game Over! Player 1 (Red) Wins!';
+                return;
+            }
+
+            const color = currentPlayer === 1 ? 'Red' : 'Black';
+            turnDisplay.textContent = `Player ${currentPlayer}'s Turn (${color})`;
+
+            if (mandatoryJumpPiece) {
+                turnDisplay.textContent += ' (Mandatory Jump!)';
+            } else if (checkForMandatoryJump(boardState, currentPlayer)) {
+                turnDisplay.textContent += ' (Jump available)';
+            }
+        }
+
+        /** Enables/disables the Undo/Redo buttons based on history index. */
+        function updateUndoRedoButtons() {
+            undoButton.disabled = historyIndex <= 0;
+            redoButton.disabled = historyIndex >= history.length - 1;
+        }
+
+        // --- MOVE VALIDATION AND LOGIC ---
+
+        /** Checks if a jump move is mandatory for the current player. */
+        function checkForMandatoryJump(state, player) {
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    const piece = state[r][c];
+                    if (piece && piece.player === player) {
+                        if (getValidJumps(state, r, c, piece.isKing).length > 0) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /** Gets all valid simple (non-jump) moves for a piece. */
+        function getValidSimpleMoves(state, r, c, isKing) {
+            const moves = [];
+            const piece = state[r][c];
+            if (!piece) return moves;
+
+            const player = piece.player;
+            const forwardDirs = isKing ? [-1, 1] : (player === 1 ? [1] : [-1]); 
+
+            for (const dr of forwardDirs) {
+                for (const dc of [-1, 1]) {
+                    const nr = r + dr;
+                    const nc = c + dc;
+
+                    if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && state[nr][nc] === null) {
+                        moves.push({ toR: nr, toC: nc });
+                    }
+                }
+            }
+            return moves;
+        }
+
+        /** Gets all valid jump moves for a piece. */
+        function getValidJumps(state, r, c, isKing) {
+            const jumps = [];
+            const piece = state[r][c];
+            if (!piece) return jumps;
+
+            const player = piece.player;
+            const opponent = player === 1 ? 2 : 1;
+            const forwardDirs = isKing ? [-1, 1] : (player === 1 ? [1] : [-1]);
+
+            for (const dr of forwardDirs) {
+                for (const dc of [-1, 1]) {
+                    const jumpR = r + dr;
+                    const jumpC = c + dc;
+                    const landR = r + 2 * dr;
+                    const landC = c + 2 * dc;
+
+                    if (landR >= 0 && landR < BOARD_SIZE && landC >= 0 && landC < BOARD_SIZE) {
+                        const jumpedPiece = state[jumpR][jumpC];
+                        const landSquare = state[landR][landC];
+
+                        if (jumpedPiece && jumpedPiece.player === opponent && landSquare === null) {
+                            jumps.push({ toR: landR, toC: landC, capturedR: jumpR, capturedC: jumpC });
+                        }
+                    }
+                }
+            }
+            return jumps;
+        }
+
+
+        // --- USER INTERACTION HANDLERS ---
+
+        /** Handles click events on board squares. */
+        function handleSquareClick(r, c) {
+            const piece = boardState[r][c];
+
+            // 1. Click on a piece of the current player
+            if (piece && piece.player === currentPlayer) {
+
+                // If a mandatory jump is active, ensure the player clicks the correct piece
+                if (mandatoryJumpPiece && (mandatoryJumpPiece.row !== r || mandatoryJumpPiece.col !== c)) {
+                    return;
+                }
+
+                // If clicking the currently selected piece, deselect it
+                if (selectedPiece && selectedPiece.row === r && selectedPiece.col === c) {
+                    clearHighlights();
+                    selectedPiece = null;
+                    return;
+                }
+                
+                // Select the new piece and highlight its moves
+                selectedPiece = { row: r, col: c };
+                highlightValidMoves(r, c, piece.isKing);
+                return;
+            }
+
+            // 2. Click on an empty square to move a selected piece
+            if (selectedPiece && piece === null) {
+                const startR = selectedPiece.row;
+                const startC = selectedPiece.col;
+                const pieceData = boardState[startR][startC];
+
+                const mustJump = checkForMandatoryJump(boardState, currentPlayer);
+
+                const validJumps = getValidJumps(boardState, startR, startC, pieceData.isKing);
+                const validSimpleMoves = getValidSimpleMoves(boardState, startR, startC, pieceData.isKing);
+
+                let isMoveValid = false;
+                let capturedPiece = null;
+
+                // Check if the move is a jump
+                const jump = validJumps.find(m => m.toR === r && m.toC === c);
+                if (jump) {
+                    isMoveValid = true;
+                    capturedPiece = { row: jump.capturedR, col: jump.capturedC };
+                }
+                // Check if the move is a simple move (only allowed if no jump is mandatory)
+                else if (!mustJump) {
+                    const simpleMove = validSimpleMoves.find(m => m.toR === r && m.toC === c);
+                    if (simpleMove) {
+                        isMoveValid = true;
+                    }
+                }
+
+                if (isMoveValid) {
+                    makeMove(startR, startC, r, c, capturedPiece);
+                } else {
+                    // Invalid move click: keep selection, but clear the invalid target highlight
+                    highlightValidMoves(startR, startC, pieceData.isKing); 
+                }
+            }
+        }
+
+        /** Highlights all squares that the selected piece can move to. */
+        function highlightValidMoves(r, c, isKing) {
+            clearHighlights();
+
+            document.querySelector(`.square[data-row="${r}"][data-col="${c}"]`).classList.add('selected');
+
+            const mustJump = checkForMandatoryJump(boardState, currentPlayer);
+            const validJumps = getValidJumps(boardState, r, c, isKing);
+
+            let movesToHighlight = [];
+
+            if (validJumps.length > 0) {
+                movesToHighlight = validJumps;
+            } else if (!mustJump) {
+                movesToHighlight = getValidSimpleMoves(boardState, r, c, isKing);
+            }
+
+            movesToHighlight.forEach(move => {
+                const targetSquare = document.querySelector(`.square[data-row="${move.toR}"][data-col="${move.toC}"]`);
+                if (targetSquare) {
+                    targetSquare.classList.add('highlight');
+                }
+            });
+        }
+
+        /** Executes the piece movement on the board state and manages turn flow. */
+        function makeMove(startR, startC, endR, endC, captured) {
+            // 1. Move piece
+            boardState[endR][endC] = boardState[startR][startC];
+            boardState[startR][startC] = null;
+
+            // 2. Check for King promotion
+            if (endR === (currentPlayer === 1 ? BOARD_SIZE - 1 : 0)) {
+                boardState[endR][endC].isKing = true;
+            }
+
+            // 3. Handle capture
+            const isJump = !!captured;
+            if (isJump) {
+                boardState[captured.row][captured.col] = null;
+            }
+
+            // 4. Check for further jumps (multi-jump rule)
+            let checkFurtherJumps = false;
+            if (isJump) {
+                const pieceData = boardState[endR][endC];
+                const furtherJumps = getValidJumps(boardState, endR, endC, pieceData.isKing);
+
+                if (furtherJumps.length > 0) {
+                    mandatoryJumpPiece = { row: endR, col: endC };
+                    checkFurtherJumps = true;
+                }
+            }
+
+            // 5. Cleanup and advance turn
+            selectedPiece = null;
+            clearHighlights();
+
+            if (!checkFurtherJumps) {
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                mandatoryJumpPiece = null;
+            } else {
+                // If multi-jump is active, the piece is auto-selected for the next hop
+                selectedPiece = mandatoryJumpPiece;
+                // Note: Highlights will be reapplied by redrawBoard calling highlightValidMoves 
+            }
+
+            saveHistory();
+            redrawBoard();
+            updateGameInfo();
+        }
+
+        // --- EVENT LISTENERS ---
+
+        document.getElementById('new-game').addEventListener('click', startGame);
+
+        document.getElementById('undo').addEventListener('click', () => {
+            if (historyIndex > 0) {
+                loadHistoryState(historyIndex - 1);
+            }
+        });
+
+        document.getElementById('redo').addEventListener('click', () => {
+            if (historyIndex < history.length - 1) {
+                loadHistoryState(historyIndex + 1);
+            }
+        });
+
+
+        // --- INITIALIZATION ---
+        startGame(); 
+
+    </script>
+</body>
+</html>

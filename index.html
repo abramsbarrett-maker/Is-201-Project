@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abram S. Barrett - Professional Resume</title>
+    <style>
+        /* --- General Styling --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4; /* Light background for professionalism */
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid #001f3f; /* Deep Navy Blue accent */
+        }
+
+        /* --- Header Section --- */
+        .header {
+            background-color: #001f3f; /* Deep Navy Blue */
+            color: #ffffff;
+            padding: 40px 50px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700; /* Bold Title */
+        }
+
+        .contact-info {
+            font-size: 1em;
+            margin-top: 10px;
+        }
+
+        .contact-info a {
+            color: #c0c0c0; /* Light gray for contrast */
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .contact-info a:hover {
+            color: #ffffff;
+        }
+
+        /* --- New Nav Bar Styling --- */
+        .nav-bar {
+            background-color: #ff6347; /* Tomato Red accent for visibility */
+            padding: 10px 0;
+            text-align: center;
+            /* Sticky position makes it stay at the top when scrolling (optional) */
+            /* position: sticky;
+            top: 0;
+            z-index: 1000; */
+        }
+
+        .nav-bar a {
+            color: #001f3f; /* Deep Navy Blue text */
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin: 0 20px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-bar a:hover {
+            background-color: #001f3f; /* Deep Navy Blue background on hover */
+            color: #ffffff; /* White text on hover */
+        }
+        
+        /* --- Content Layout --- */
+        .content-body {
+            display: flex;
+            padding: 30px 50px;
+        }
+
+        /* The main column for experience and education */
+        .main-column {
+            flex: 3;
+            padding-right: 30px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        /* The sidebar for skills and languages */
+        .sidebar {
+            flex: 1;
+            padding-left: 30px;
+        }
+
+        /* --- Section Styling --- */
+        .section {
+            margin-bottom: 30px;
+            /* Added ID selectors for navigation targets */
+        }
+        #experience { margin-top: -10px; padding-top: 10px; }
+        #education { margin-top: -10px; padding-top: 10px; }
+        #skills { margin-top: -10px; padding-top: 10px; }
+        #contact { margin-top: -10px; padding-top: 10px; }
+
+
+        h2 {
+            font-size: 1.3em;
+            color: #001f3f; /* Deep Navy Blue for headers */
+            border-bottom: 2px solid #001f3f;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: 700; /* Bold Header */
+        }
+
+        /* --- Job and Education Details --- */
+        .job-entry, .education-entry {
+            margin-bottom: 20px;
+        }
+
+        .job-title, .school-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .company-dates {
+            font-style: italic;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .job-description {
+            margin-top: 5px;
+            font-size: 0.95em;
+        }
+
+        /* --- Lists (Skills and Languages) */
+        ul {
+            list-style: none;
+            padding-left: 0;
+            font-size: 0.95em;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+            padding-left: 1.2em;
+            position: relative;
+        }
+
+        /* Custom bullet point for aesthetic */
+        ul li::before {
+            content: '•';
+            color: #ff6347; /* Tomato Red accent for list items */
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1.2em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Abram S. Barrett</h1>
+            <div class="contact-info">
+                <a href="tel:3088501422">(308) 850-1422</a> | 
+                <a href="mailto:abrams.barrett@gmail.com">abrams.barrett@gmail.com</a>
+            </div>
+        </div>
+
+        <div class="nav-bar">
+            <a href="#experience">Experience</a>
+            <a href="#education">Education</a>
+            <a href="#skills">Skills</a>
+            <a href="#community">Service</a>
+            <a href="#references">References</a>
+            <a href="projectgame.html">Checkers</a>
+            <a href="Scrapsheet.html">All About the Monkeys</a>
+        </div>
+        <div class="content-body">
+            <div class="main-column">
+                
+                <div class="section" id="experience">
+                    <h2>Experience</h2>
+                    <div class="job-entry">
+                        <div class="job-title">Resident Assistant</div>
+                        <div class="company-dates">Brigham Young University, Provo, UT (July 2025 - August 2025)</div>
+                        <div class="job-description">Provo, UT 84602</div>
+                    </div>
+
+                    <div class="job-entry">
+                        <div class="job-title">Drill Hand Associate</div>
+                        <div class="company-dates">RB&G Engineering, Provo, UT (February 2025 - April 2025)</div>
+                        <div class="job-description">343 E 300 S, Provo, UT 84606</div>
+                    </div>
+                    
+                    <div class="job-entry">
+                        <div class="job-title">Equipment Operator</div>
+                        <div class="company-dates">Specialty Foundation Systems, Billings, MT (August 2022 - December 2022)</div>
+                    </div>
+                    
+                    <div class="job-entry">
+                        <div class="job-title">Sales Associate</div>
+                        <div class="company-dates">Main Street Menswear, Billings, MT (February 2022 - April 2022)</div>
+                    </div>
+                    
+                    <div class="job-entry">
+                        <div class="job-title">General Constructor</div>
+                        <div class="company-dates">Matt Picard HandyMan, Billings, MT (2020 - 2021)</div>
+                    </div>
+
+                    <div class="job-entry">
+                        <div class="job-title">Customer and Sales Specialist</div>
+                        <div class="company-dates">Crepe Diem, Billings, MT (2020 - 2022)</div>
+                    </div>
+
+                    <div class="job-entry">
+                        <div class="job-title">Firework Sales Associate</div>
+                        <div class="company-dates">Firework Stand, Laurel, MT (June 2020 - July 2020)</div>
+                    </div>
+                    
+                    <div class="job-entry">
+                        <div class="job-title">General Labor/Action Entertainment</div>
+                        <div class="company-dates">Action Entertainment, Billings, MT (2017 - 2018)</div>
+                    </div>
+                </div>
+                
+                <div class="section" id="education">
+                    <h2>Education</h2>
+                    <div class="education-entry">
+                        <div class="school-name">Brigham Young University</div>
+                        <div class="company-dates">Current Student (Started 2025 - Present)</div>
+                        <div class="job-description">Provo, UT 84602</div>
+                    </div>
+
+                    <div class="education-entry">
+                        <div class="school-name">Billings West High School</div>
+                        <div class="company-dates">High School Diploma (Graduate 2022)</div>
+                        <div class="job-description">2201 St. John's Avenue, Billings, MT 59102</div>
+                    </div>
+                    
+                    <div class="education-entry">
+                        <div class="school-name">Montana State University Billings</div>
+                        <div class="company-dates">Coursework in Writing, Computer Apps, and College Government (2019 - 2022)</div>
+                        <div class="job-description">1500 University Dr, Billings, MT</div>
+                    </div>
+                </div>
+                
+                <div class="section" id="community">
+                    <h2>Community Service</h2>
+                    <ul>
+                        <li>Religious mission of 2 years in Uruguay, South America (2023-2024)</li>
+                    </ul>
+                </div>
+                
+                <div class="section" id="references">
+                    <h2>References</h2>
+                    <ul>
+                        <li>Moses Bain: Owner of Crepe Diem</li>
+                        <li>Taj Mukadam: Owner of Specialty Foundation Systems</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="sidebar">
+                
+                <div class="section" id="skills">
+                    <h2>Skills and Talents</h2>
+                    <ul>
+                        <li>**Technical Skills:** Tableau, HTML, VBA, SQL, AI Tools</li>
+                        <li>Computer and Technology Understanding</li>
+                        <li>Bilingual</li>
+                        <li>Social and Communication Skills</li>
+                        <li>Excellent Problem Solving Skills</li>
+                        <li>Hard Working and Determined</li>
+                        <li>Quick Learner</li>
+                        <li>Diligent Worker</li>
+                    </ul>
+                </div>
+                
+                <div class="section">
+                    <h2>Languages</h2>
+                    <ul>
+                        <li>English</li>
+                        <li>Spanish</li>
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
