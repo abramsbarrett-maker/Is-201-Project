@@ -11,7 +11,7 @@
     text-align: center;
     
     /* === FIX 1: Make it fixed & full width === */
-    position: fixed; /* Makes it stick when scrolling */
+    position: absolute; /* Makes it stick when scrolling */
     top: 0;          /* Anchors it to the top edge of the viewport */
     width: 100%;     /* Ensures it spans the full width of the viewport */
     
