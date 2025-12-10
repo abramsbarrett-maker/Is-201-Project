@@ -25,6 +25,7 @@
             border: 8px solid #8b4513; /* Saddle Brown Border */
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             margin: 20px;
+            position: relative; 
         }
 
         .square {
@@ -56,7 +57,7 @@
             box-shadow: inset 0 0 0 4px #4169e1; /* Royal Blue */
         }
 
-        /* --- Piece Styling --- */
+        /* --- Piece Styling (Reverted to Standard Checkers) --- */
         .piece {
             width: 50px;
             height: 50px;
@@ -70,15 +71,16 @@
             z-index: 10; 
         }
         
-        /* Natural Colors for the Pieces */
+        /* Player 1: Standard Red Piece */
         .piece.player1 {
-            background-color: #8b0000; /* Dark Red/Maroon */
-            color: white;
+            background-color: #8b0000; /* Dark Red */
+            color: white; 
         }
 
+        /* Player 2: Standard Black Piece */
         .piece.player2 {
-            background-color: #000000; /* Black */
-            color: white;
+            background-color: #000000;
+            color: white; 
         }
 
         .king::after {
@@ -87,7 +89,7 @@
             font-size: 24px;
             line-height: 1;
         }
-
+        
         /* --- Info and Controls --- */
         .game-info {
             text-align: center;
@@ -128,17 +130,13 @@
         }
 
         .nav-bar {
-            background-color: #000000; /* Tomato Red accent for visibility */
+            background-color: #000000; 
             padding: 10px 0;
             text-align: center;
-            /* Sticky position makes it stay at the top when scrolling (optional) */
-            /* position: sticky;
-            top: 0;
-            z-index: 1000; */
         }
 
         .nav-bar a {
-            color: #ffffff; /* Deep Navy Blue text */
+            color: #ffffff; 
             text-decoration: none;
             text-transform: uppercase;
             font-weight: 700;
@@ -150,8 +148,8 @@
         }
 
         .nav-bar a:hover {
-            background-color: #001f3f; /* Deep Navy Blue background on hover */
-            color: #ffffff; /* White text on hover */
+            background-color: #001f3f; 
+            color: #ffffff; 
         }
         
     </style>
@@ -350,8 +348,6 @@
         }
 
         // --- MOVE VALIDATION AND LOGIC ---
-
-        /** Checks if a jump move is mandatory for the current player. */
         function checkForMandatoryJump(state, player) {
             for (let r = 0; r < BOARD_SIZE; r++) {
                 for (let c = 0; c < BOARD_SIZE; c++) {
@@ -366,7 +362,6 @@
             return false;
         }
 
-        /** Gets all valid simple (non-jump) moves for a piece. */
         function getValidSimpleMoves(state, r, c, isKing) {
             const moves = [];
             const piece = state[r][c];
@@ -388,7 +383,6 @@
             return moves;
         }
 
-        /** Gets all valid jump moves for a piece. */
         function getValidJumps(state, r, c, isKing) {
             const jumps = [];
             const piece = state[r][c];
@@ -508,7 +502,7 @@
             });
         }
 
-        /** Executes the piece movement on the board state and manages turn flow. */
+        /** Executes the piece movement on the board state and manages turn flow (Reverted). */
         function makeMove(startR, startC, endR, endC, captured) {
             // 1. Move piece
             boardState[endR][endC] = boardState[startR][startC];
@@ -522,6 +516,7 @@
             // 3. Handle capture
             const isJump = !!captured;
             if (isJump) {
+                // The banana explosion logic has been removed here.
                 boardState[captured.row][captured.col] = null;
             }
 
@@ -547,7 +542,6 @@
             } else {
                 // If multi-jump is active, the piece is auto-selected for the next hop
                 selectedPiece = mandatoryJumpPiece;
-                // Note: Highlights will be reapplied by redrawBoard calling highlightValidMoves 
             }
 
             saveHistory();

@@ -11,7 +11,7 @@
     text-align: center;
     
     /* === FIX 1: Make it fixed & full width === */
-    position: absolute; /* Makes it stick when scrolling */
+    position: relative; /* Makes it stick when scrolling */
     top: 0;          /* Anchors it to the top edge of the viewport */
     width: 100%;     /* Ensures it spans the full width of the viewport */
     
@@ -49,6 +49,9 @@
     height: 100px;
     text-align: center;
     background-color: rgb(30, 156, 168);
+    margin: 10px;
+    margin-top: 0px;
+    margin-right: 1px;
     
     /* === FIX 3: Push the header down below the fixed nav bar === */
     /* The fixed nav bar is about 40px tall (10px top/bottom padding) */
@@ -76,7 +79,7 @@
     width: 180px;
     background-color: rgb(219, 201, 177);
     text-align: center;
-
+    padding-right: 10px;
 }
 
 .body {
@@ -90,7 +93,9 @@
     height: fit-content;
     background-color: rgb(219, 201, 177);
     padding-left: 10px;
-    padding-right: 10px;
+    padding-right: 5px;
+    margin: 10px;
+    margin-right: 1px;
 }
 
 /* --- Footer and Typography (Existing) --- */
